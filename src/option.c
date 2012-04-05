@@ -117,6 +117,7 @@ struct myoption {
 #define LOPT_RA        306
 #define LOPT_DUID      307
 #define LOPT_HOST_REC  308
+#define LOPT_SEC_VALID 309
 
 #ifdef HAVE_GETOPT_LONG
 static const struct option opts[] =  
@@ -239,6 +240,7 @@ static const struct myoption opts[] =
     { "enable-ra", 0, 0, LOPT_RA },
     { "dhcp-duid", 1, 0, LOPT_DUID },
     { "host-record", 1, 0, LOPT_HOST_REC },
+    { "dnssec", 0, 0, LOPT_SEC_VALID },
     { NULL, 0, 0, 0 }
   };
 
@@ -368,6 +370,9 @@ static struct {
   { LOPT_RA, OPT_RA, NULL, gettext_noop("Send router-advertisements for interfaces doing DHCPv6"), NULL },
   { LOPT_DUID, ARG_ONE, "<enterprise>,<duid>", gettext_noop("Specify DUID_EN-type DHCPv6 server DUID"), NULL },
   { LOPT_HOST_REC, ARG_DUP, "<name>,<address>", gettext_noop("Specify host (A/AAAA and PTR) records"), NULL },
+#ifdef HAVE_DNSSEC
+  { LOPT_SEC_VALID, OPT_DNSSEC_VALIDATE, NULL, gettext_noop("Activate DNSSEC validation"), NULL },
+#endif
   { 0, 0, NULL, NULL, NULL }
 }; 
 
