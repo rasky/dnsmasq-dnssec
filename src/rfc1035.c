@@ -27,8 +27,8 @@ static int add_resource_record(struct dns_header *header, char *limit, int *trun
 #define ADD_RDLEN(header, pp, plen, len) \
   (!CHECK_LEN(header, pp, plen, len) ? 0 : (((pp) += (len)), 1))
 
-static int extract_name(struct dns_header *header, size_t plen, unsigned char **pp, 
-			char *name, int isExtract, int extrabytes)
+int extract_name(struct dns_header *header, size_t plen, unsigned char **pp, 
+		 char *name, int isExtract, int extrabytes)
 {
   unsigned char *cp = (unsigned char *)name, *p = *pp, *p1 = NULL;
   unsigned int j, l, hops = 0;
@@ -333,7 +333,7 @@ static unsigned char *skip_name(unsigned char *ansp, struct dns_header *header, 
   return ansp;
 }
 
-static unsigned char *skip_questions(struct dns_header *header, size_t plen)
+unsigned char *skip_questions(struct dns_header *header, size_t plen)
 {
   int q;
   unsigned char *ansp = (unsigned char *)(header+1);

@@ -865,6 +865,9 @@ void keydata_free(struct keydata *blocks);
 #endif
 
 /* rfc1035.c */
+int extract_name(struct dns_header *header, size_t plen, unsigned char **pp, 
+                 char *name, int isExtract, int extrabytes);
+unsigned char *skip_questions(struct dns_header *header, size_t plen);
 unsigned int extract_request(struct dns_header *header, size_t qlen, 
 			       char *name, unsigned short *typep);
 size_t setup_reply(struct dns_header *header, size_t  qlen,
@@ -883,6 +886,9 @@ unsigned int questions_crc(struct dns_header *header, size_t plen, char *buff);
 size_t resize_packet(struct dns_header *header, size_t plen, 
 		  unsigned char *pheader, size_t hlen);
 size_t add_mac(struct dns_header *header, size_t plen, char *limit, union mysockaddr *l3);
+
+/* dnssec.c */
+int dnssec_validate(struct dns_header *header, size_t plen);
 
 /* util.c */
 void rand_init(void);
