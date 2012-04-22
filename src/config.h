@@ -126,7 +126,7 @@ RESOLVFILE
 /* #define HAVE_IDN */
 /* #define HAVE_CONNTRACK */
 #define HAVE_DNSSEC
-
+#define HAVE_OPENSSL
 
 
 /* Default locations for important system files. */
