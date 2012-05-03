@@ -1170,7 +1170,7 @@ void dump_cache(time_t now)
 	    else if (cache->flags & F_DS)
 	      {
 		a = daemon->addrbuff;
-		sprintf(a, "%5u %3u %3u %u", cache->addr.key.flags_or_keyid,
+		sprintf(a, "%5u %3u %3u %u", cache->addr.key.keytag,
 			cache->addr.key.algo, cache->addr.key.digest, cache->uid);
 	      }
 #endif
@@ -1317,6 +1317,8 @@ struct keydata *keydata_alloc(char *data, size_t len)
 {
   struct keydata *block, *ret = NULL;
   struct keydata **prev = &ret;
+  size_t blen;
+
   while (len > 0)
     {
       if (keyblock_free)
@@ -1334,15 +1336,31 @@ struct keydata *keydata_alloc(char *data, size_t len)
 	  return NULL;
 	}
       
-      memcpy(block->key, data, len > KEYBLOCK_LEN ? KEYBLOCK_LEN : len);
-      data += KEYBLOCK_LEN;
-      len -= KEYBLOCK_LEN;
+      blen = len > KEYBLOCK_LEN ? KEYBLOCK_LEN : len;
+      memcpy(block->key, data, blen);
+      data += blen;
+      len -= blen;
       *prev = block;
       prev = &block->next;
       block->next = NULL;
     }
   
   return ret;
+}
+
+size_t keydata_walk(struct keydata **key, unsigned char **p, size_t cnt)
+{
+  if (*p == NULL)
+    *p = (*key)->key;
+  else if (*p == (*key)->key + KEYBLOCK_LEN)
+    {
+      *key = (*key)->next;
+      if (*key == NULL)
+        return 0;
+      *p = (*key)->key;
+    }
+
+  return MIN(cnt, (*key)->key + KEYBLOCK_LEN - (*p));
 }
 
 void keydata_free(struct keydata *blocks)

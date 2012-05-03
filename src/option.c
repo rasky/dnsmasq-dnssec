@@ -109,7 +109,7 @@ struct myoption {
 #define LOPT_NO_REBIND 298
 #define LOPT_LOC_REBND 299
 #define LOPT_ADD_MAC   300
-#define LOPT_DNSSEC    301
+#define LOPT_SEC_PROXY 301
 #define LOPT_INCR_ADDR 302
 #define LOPT_CONNTRACK 303
 #define LOPT_FQDN      304
@@ -118,6 +118,7 @@ struct myoption {
 #define LOPT_DUID      307
 #define LOPT_HOST_REC  308
 #define LOPT_TFTP_LC   309
+#define LOPT_SEC_VALID 310
 
 #ifdef HAVE_GETOPT_LONG
 static const struct option opts[] =  
@@ -233,7 +234,7 @@ static const struct myoption opts[] =
     { "dhcp-generate-names", 2, 0, LOPT_GEN_NAMES },
     { "rebind-localhost-ok", 0, 0,  LOPT_LOC_REBND },
     { "add-mac", 0, 0, LOPT_ADD_MAC },
-    { "proxy-dnssec", 0, 0, LOPT_DNSSEC },
+    { "proxy-dnssec", 0, 0, LOPT_SEC_PROXY },
     { "dhcp-sequential-ip", 0, 0,  LOPT_INCR_ADDR },
     { "conntrack", 0, 0, LOPT_CONNTRACK },
     { "dhcp-client-update", 0, 0, LOPT_FQDN },
@@ -241,6 +242,7 @@ static const struct myoption opts[] =
     { "enable-ra", 0, 0, LOPT_RA },
     { "dhcp-duid", 1, 0, LOPT_DUID },
     { "host-record", 1, 0, LOPT_HOST_REC },
+    { "dnssec", 0, 0, LOPT_SEC_VALID },
     { NULL, 0, 0, 0 }
   };
 
@@ -364,13 +366,16 @@ static struct {
   { LOPT_PXE_SERV, ARG_DUP, "<service>", gettext_noop("Boot service for PXE menu."), NULL },
   { LOPT_TEST, 0, NULL, gettext_noop("Check configuration syntax."), NULL },
   { LOPT_ADD_MAC, OPT_ADD_MAC, NULL, gettext_noop("Add requestor's MAC address to forwarded DNS queries."), NULL },
-  { LOPT_DNSSEC, OPT_DNSSEC, NULL, gettext_noop("Proxy DNSSEC validation results from upstream nameservers."), NULL },
+  { LOPT_SEC_PROXY, OPT_DNSSEC_PROXY, NULL, gettext_noop("Proxy DNSSEC validation results from upstream nameservers."), NULL },
   { LOPT_INCR_ADDR, OPT_CONSEC_ADDR, NULL, gettext_noop("Attempt to allocate sequential IP addresses to DHCP clients."), NULL },
   { LOPT_CONNTRACK, OPT_CONNTRACK, NULL, gettext_noop("Copy connection-track mark from queries to upstream connections."), NULL },
   { LOPT_FQDN, OPT_FQDN_UPDATE, NULL, gettext_noop("Allow DHCP clients to do their own DDNS updates."), NULL },
   { LOPT_RA, OPT_RA, NULL, gettext_noop("Send router-advertisements for interfaces doing DHCPv6"), NULL },
   { LOPT_DUID, ARG_ONE, "<enterprise>,<duid>", gettext_noop("Specify DUID_EN-type DHCPv6 server DUID"), NULL },
   { LOPT_HOST_REC, ARG_DUP, "<name>,<address>", gettext_noop("Specify host (A/AAAA and PTR) records"), NULL },
+#ifdef HAVE_DNSSEC
+  { LOPT_SEC_VALID, OPT_DNSSEC_VALIDATE, NULL, gettext_noop("Activate DNSSEC validation"), NULL },
+#endif
   { 0, 0, NULL, NULL, NULL }
 }; 
 

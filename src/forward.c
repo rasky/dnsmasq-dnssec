@@ -464,7 +464,7 @@ static size_t process_reply(struct dns_header *header, time_t now,
     }
 
   /* RFC 4035 sect 4.6 para 3 */
-  if (!is_sign && !option_bool(OPT_DNSSEC))
+  if (!is_sign && !option_bool(OPT_DNSSEC_PROXY))
      header->hb4 &= ~HB4_AD;
 
   if (OPCODE(header) != QUERY || (RCODE(header) != NOERROR && RCODE(header) != NXDOMAIN))
@@ -479,7 +479,12 @@ static size_t process_reply(struct dns_header *header, time_t now,
       if (!option_bool(OPT_LOG))
 	server->flags |= SERV_WARNED_RECURSIVE;
     }  
-    
+
+#ifdef HAVE_DNSSEC
+    printf("validate\n");
+   dnssec_validate(header, n);
+#endif
+
   if (daemon->bogus_addr && RCODE(header) != NXDOMAIN &&
       check_for_bogus_wildcard(header, n, daemon->namebuff, daemon->bogus_addr, now))
     {

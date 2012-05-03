@@ -50,6 +50,10 @@
 #define T_SRV		33
 #define T_NAPTR		35
 #define T_OPT		41
+#define T_DS            43
+#define T_RRSIG         46
+#define T_NSEC          47
+#define T_DNSKEY        48
 #define	T_TKEY		249		
 #define	T_TSIG		250
 #define T_MAILB		253	
@@ -112,3 +116,20 @@ struct dns_header {
 	(cp) += 4; \
 }
 
+#define CHECKED_GETCHAR(var, ptr, len) do { \
+    if ((len) < 1) return 0; \
+    var = *ptr++; \
+    (len) -= 1; \
+  } while (0)
+
+#define CHECKED_GETSHORT(var, ptr, len) do { \
+    if ((len) < 2) return 0; \
+    GETSHORT(var, ptr); \
+    (len) -= 2; \
+  } while (0)
+
+#define CHECKED_GETLONG(var, ptr, len) do { \
+    if ((len) < 4) return 0; \
+    GETLONG(var, ptr); \
+    (len) -= 4; \
+  } while (0)

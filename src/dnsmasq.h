@@ -56,6 +56,9 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
+#define countof(x)      (long)(sizeof(x) / sizeof(x[0]))
+#define MIN(a,b)        ((a) < (b) ? (a) : (b))
+
 #include "dns-protocol.h"
 #include "dhcp-protocol.h"
 #ifdef HAVE_DHCP6
@@ -212,13 +215,14 @@ struct event_desc {
 #define OPT_NO_OVERRIDE    30
 #define OPT_NO_REBIND      31
 #define OPT_ADD_MAC        32
-#define OPT_DNSSEC         33
+#define OPT_DNSSEC_PROXY   33
 #define OPT_CONSEC_ADDR    34
 #define OPT_CONNTRACK      35
 #define OPT_FQDN_UPDATE    36
 #define OPT_RA             37
 #define OPT_TFTP_LC        38
-#define OPT_LAST           39
+#define OPT_DNSSEC_VALIDATE 39
+#define OPT_LAST           40
 
 /* extra flags for my_syslog, we use a couple of facilities since they are known 
    not to occupy the same bits as priorities, no matter how syslog.h is set up. */
@@ -316,7 +320,7 @@ struct crec {
       struct keydata *keydata;
       unsigned char algo;
       unsigned char digest; /* DS only */
-      unsigned short flags_or_keyid; /* flags for DNSKEY, keyid for DS */
+      unsigned short keytag;
     } key;
   } addr;
   time_t ttd; /* time to die */
@@ -861,10 +865,15 @@ char *get_domain6(struct in6_addr *addr);
 #endif
 #ifdef HAVE_DNSSEC
 struct keydata *keydata_alloc(char *data, size_t len);
+size_t keydata_walk(struct keydata **key, unsigned char **p, size_t cnt);
 void keydata_free(struct keydata *blocks);
 #endif
 
 /* rfc1035.c */
+int extract_name(struct dns_header *header, size_t plen, unsigned char **pp, 
+                 char *name, int isExtract, int extrabytes);
+unsigned char *skip_name(unsigned char *ansp, struct dns_header *header, size_t plen, int extrabytes);
+unsigned char *skip_questions(struct dns_header *header, size_t plen);
 unsigned int extract_request(struct dns_header *header, size_t qlen, 
 			       char *name, unsigned short *typep);
 size_t setup_reply(struct dns_header *header, size_t  qlen,
@@ -883,6 +892,9 @@ unsigned int questions_crc(struct dns_header *header, size_t plen, char *buff);
 size_t resize_packet(struct dns_header *header, size_t plen, 
 		  unsigned char *pheader, size_t hlen);
 size_t add_mac(struct dns_header *header, size_t plen, char *limit, union mysockaddr *l3);
+
+/* dnssec.c */
+int dnssec_validate(struct dns_header *header, size_t plen);
 
 /* util.c */
 void rand_init(void);
